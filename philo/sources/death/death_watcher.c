@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/26 21:45:12 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 21:45:22 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/26 23:23:19 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,10 +30,15 @@ bool	has_simulation_stopped(t_table *table)
 
 /* death_watcher:
 *	Monitor thread that checks:
-*	- if a philosopher died (time since last meal >= time_to_die)
-*	- if all philosophers ate enough times (optional argument)
+*	- if a philosopher died (time since last_meal >= time_to_die)
+*	- if all philosophers ate enough times (optional must_eat_count condition)
 *
-*	It runs until end_condition_reached() returns true.
+*	The watcher starts monitoring only after the common start_time
+*	(using sim_start_delay()).
+*
+*	It runs until:
+*	- sim_stop becomes true
+*	- or end_condition_reached() returns true (death or everyone ate enough)
 */
 void	*death_watcher(void *data)
 {
@@ -42,10 +47,11 @@ void	*death_watcher(void *data)
 	table = (t_table *)data;
 	if (table->must_eat_count == 0)
 		return (NULL);
-	set_sim_stop_flag(table, false);
 	sim_start_delay(table->start_time);
 	while (true)
 	{
+		if (has_simulation_stopped(table) == true)
+			return (NULL);
 		if (end_condition_reached(table) == true)
 			return (NULL);
 		usleep(100);

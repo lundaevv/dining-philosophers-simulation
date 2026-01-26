@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/19 19:58:56 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:05:47 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/26 23:25:39 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,48 +29,41 @@ static bool	philo_is_full(t_philo *philo)
 }
 
 /* eat_sleep_routine:
-*	Main cycle step:
+*	One full cycle step:
 *	1) lock both forks (mutexes)
 *	2) print fork states + "is eating"
-*	3) update last_meal (protected)
+*	3) update last_meal timestamp (protected by meal_time_lock)
 *	4) sleep time_to_eat
-*	5) increment times_ate (protected, if sim not stopped)
-*	6) print "is sleeping"
-*	7) unlock both forks
+*	5) increment times_ate (protected, only if sim_stop is false)
+*	6) unlock both forks
+*	7) print "is sleeping"
 *	8) sleep time_to_sleep
 */
 static void	eat_sleep_routine(t_philo *philo)
 {
-	pthread_mutex_lock(&philo->table->fork_locks[philo->fork[0]]);
-	write_status(philo, false, GOT_FORK_1);
-	pthread_mutex_lock(&philo->table->fork_locks[philo->fork[1]]);
-	write_status(philo, false, GOT_FORK_2);
+	if (!take_forks(philo))
+		return ;
 	write_status(philo, false, EATING);
-	pthread_mutex_lock(&philo->meal_time_lock);
-	philo->last_meal = get_time_in_ms();
-	pthread_mutex_unlock(&philo->meal_time_lock);
+	update_last_meal(philo);
 	philo_sleep(philo->table, philo->table->time_to_eat);
-	if (has_simulation_stopped(philo->table) == false)
-	{
-		pthread_mutex_lock(&philo->meal_time_lock);
-		philo->times_ate += 1;
-		pthread_mutex_unlock(&philo->meal_time_lock);
-	}
+	increment_times_ate(philo);
+	drop_forks(philo);
 	write_status(philo, false, SLEEPING);
-	pthread_mutex_unlock(&philo->table->fork_locks[philo->fork[1]]);
-	pthread_mutex_unlock(&philo->table->fork_locks[philo->fork[0]]);
 	philo_sleep(philo->table, philo->table->time_to_sleep);
 }
 
 /* think_routine:
 *	Adds a controlled delay to reduce contention between philosophers.
-*	The thinking time is calculated from:
-*	- time_to_die
-*	- time since last_meal
-*	- time_to_eat
 *
-*	"silent" mode is used for initial staggering.
-*	Also caps long thinking time to reduce idle sleeping/overdelays.
+*	The thinking time is computed as:
+*	(time_to_die - time_since_last_meal - time_to_eat) / 2
+*
+*	Notes:
+*	- The value can become negative and is clamped to 0.
+*	- If silent == true and computed time is 0,
+*	  we sleep 1ms to avoid tight loops.
+*	- Long values are capped to reduce excessive idle waiting.
+*	- If silent == false, prints "is thinking".
 */
 static void	think_routine(t_philo *philo, bool silent)
 {
@@ -101,7 +94,8 @@ static void	*lone_philo_routine(t_philo *philo)
 	pthread_mutex_lock(&philo->table->fork_locks[philo->fork[0]]);
 	write_status(philo, false, GOT_FORK_1);
 	philo_sleep(philo->table, philo->table->time_to_die);
-	write_status(philo, false, DIED);
+	set_sim_stop_flag(philo->table, true);
+	write_status(philo, true, DIED);
 	pthread_mutex_unlock(&philo->table->fork_locks[philo->fork[0]]);
 	return (NULL);
 }
@@ -110,7 +104,7 @@ static void	*lone_philo_routine(t_philo *philo)
 *	Thread routine for each philosopher.
 *	- initializes last_meal to start_time
 *	- waits for global start delay
-*	- handles special cases (0 meals required, 1 philosopher)
+*	- handles special cases (0 meals required, 1 philosopher, time_to_die == 0)
 *	- runs eat/sleep/think loop until:
 *		- sim_stop becomes true
 *		- or this philosopher reached must_eat_count

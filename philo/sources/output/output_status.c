@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/26 16:39:19 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:05:09 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/26 23:19:44 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,22 +18,37 @@
 */
 static void	print_status(t_philo *philo, char *str)
 {
-	printf("%ld %d %s\n", get_time_in_ms() - philo->table->start_time,
-		philo->id + 1, str);
+	time_t	now;
+	time_t	ts;
+
+	now = get_time_in_ms();
+	ts = now - philo->table->start_time;
+	if (ts < 0)
+		ts = 0;
+	printf("%ld %d %s\n", ts, philo->id + 1, str);
 }
 
 /* write_status:
 *	Thread-safe status printer.
 *	write_lock ensures output lines never overlap.
 *
-*	If sim_stop is already true:
-*	- philosophers stop printing actions
-*	- death_watcher is allowed to print the death line once
+*	Printing rules:
+*	- If watcher == false (philosopher thread) and sim_stop is already true,
+*	  do not print anything.
+*	- If watcher == true (death watcher / special caller), printing is allowed
+*	  even after sim_stop (used for the final "died" message).
+*
+*	We check sim_stop twice:
+*	1) before locking write_lock (fast path)
+*	2) after locking write_lock (prevents rare race where sim_stop becomes true
+*	   between the first check and the lock acquisition).
 */
 void	write_status(t_philo *philo, bool watcher, t_status status)
 {
+	if (!watcher && has_simulation_stopped(philo->table))
+		return ;
 	pthread_mutex_lock(&philo->table->write_lock);
-	if (has_simulation_stopped(philo->table) == true && watcher == false)
+	if (!watcher && has_simulation_stopped(philo->table))
 	{
 		pthread_mutex_unlock(&philo->table->write_lock);
 		return ;
@@ -46,7 +61,7 @@ void	write_status(t_philo *philo, bool watcher, t_status status)
 		print_status(philo, "is sleeping");
 	else if (status == THINKING)
 		print_status(philo, "is thinking");
-	else if (status == GOT_FORK_1 || status == GOT_FORK_2)
+	else
 		print_status(philo, "has taken a fork");
 	pthread_mutex_unlock(&philo->table->write_lock);
 }

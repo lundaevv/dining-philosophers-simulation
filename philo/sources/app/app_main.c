@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 15:24:48 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:01:29 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/26 22:49:54 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,11 @@ int	main(int ac, char **av)
 	table = init_table(ac, av);
 	if (!table)
 		return (EXIT_FAILURE);
+	if (table->must_eat_count == 0)
+	{
+		cleanup_table(table);
+		return (EXIT_SUCCESS);
+	}
 	if (!start_simulation(table))
 		return (EXIT_FAILURE);
 	stop_simulation(table);

@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 11:24:05 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:05:23 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/26 22:53:02 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,23 @@ int	integer_atoi(char *str)
 	return ((int)nb);
 }
 
+/* validate_numeric_arg:
+*	Validates one argv[i]:
+*	- digits only
+*	- integer_atoi() must not overflow (must not return -1)
+*/
+static bool	validate_numeric_arg(char *arg)
+{
+	int	nb;
+
+	if (!contains_only_digits(arg))
+		return (false);
+	nb = integer_atoi(arg);
+	if (nb == -1)
+		return (false);
+	return (true);
+}
+
 /* is_valid_input:
 *	Checks required argument count and numeric constraints.
 *	- all args must be digits only
@@ -67,13 +84,11 @@ bool	is_valid_input(int ac, char **av)
 	i = 1;
 	while (i < ac)
 	{
-		if (!contains_only_digits(av[i]))
+		if (!validate_numeric_arg(av[i]))
 			return (print_msg(STR_ERR_INPUT_DIGIT, av[i], false));
 		nb = integer_atoi(av[i]);
 		if (i == 1 && (nb <= 0 || nb > MAX_PHILOS))
 			return (print_msg(STR_ERR_INPUT_POFLOW, STR_MAX_PHILOS, false));
-		if (i != 1 && nb == -1)
-			return (print_msg(STR_ERR_INPUT_DIGIT, av[i], false));
 		i++;
 	}
 	return (true);

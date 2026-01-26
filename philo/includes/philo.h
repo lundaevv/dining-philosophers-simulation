@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/20 13:48:05 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:01:05 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/26 22:59:01 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,6 +142,12 @@ void			assign_all_forks(t_table *table);
 
 /* philo/philo_routine.c */
 void			*philosopher(void *data);
+
+/* philo/philo_routine_helpers.c */
+bool			take_forks(t_philo *philo);
+void			drop_forks(t_philo *philo);
+void			update_last_meal(t_philo *philo);
+void			increment_times_ate(t_philo *philo);
 
 /* time/time_clock.c */
 time_t			get_time_in_ms(void);

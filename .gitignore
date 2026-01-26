@@ -18,6 +18,7 @@ build/
 *.gch
 *.dSYM/
 vgcore.*
+*.txt
 
 # macOS / system junk
 .DS_Store

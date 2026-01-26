@@ -6,7 +6,7 @@
 #    By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/20 12:51:45 by vlundaev          #+#    #+#              #
-#    Updated: 2026/01/26 22:00:33 by vlundaev         ###   ########.fr        #
+#    Updated: 2026/01/26 22:59:18 by vlundaev         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,7 @@ SRC =  app/app_main.c \
        output/output_errors.c \
        cleanup/cleanup_table.c \
        philo/philo_routine.c \
+       philo/philo_routine_helpers.c \
        time/time_clock.c \
        time/time_sleep.c
 
