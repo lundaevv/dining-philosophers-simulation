@@ -6,12 +6,12 @@
 #    By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/10/20 12:51:45 by vlundaev          #+#    #+#              #
-#    Updated: 2026/01/26 22:59:18 by vlundaev         ###   ########.fr        #
+#    Updated: 2026/01/26 23:42:47 by vlundaev         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME	= philo
-CC		= cc
+CC	= cc
 CFLAGS	= -Werror -Wall -Wextra -pthread
 
 SRC_PATH = sources/
@@ -37,10 +37,10 @@ SRC =  app/app_main.c \
        time/time_sleep.c
 
 SRCS	= $(addprefix $(SRC_PATH), $(SRC))
-OBJ		= $(SRC:.c=.o)
+OBJ	= $(SRC:.c=.o)
 OBJS	= $(addprefix $(OBJ_PATH), $(OBJ))
 
-INC		= -I ./includes/
+INC	= -I ./includes/
 
 all: $(NAME)
 

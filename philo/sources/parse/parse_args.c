@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 11:24:05 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:53:02 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/27 01:12:35 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ static bool	validate_numeric_arg(char *arg)
 
 /* is_valid_input:
 *	Checks required argument count and numeric constraints.
+*	- program name (i = 0) is ignored
 *	- all args must be digits only
 *	- philosophers count must be in range [1..MAX_PHILOS]
 *	- other args must be <= INT_MAX

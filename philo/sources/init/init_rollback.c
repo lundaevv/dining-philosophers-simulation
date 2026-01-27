@@ -6,14 +6,15 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/26 14:23:02 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:03:37 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/27 03:29:56 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 /* rollback_forks:
-*	Destroys and frees fork mutexes up to index "last - 1".
+*	Destroys and frees fork mutexes up to index "last - 1" - the last
+*	successfully initialized fork (last (i) - failed: was not malloced).
 *	Used when fork initialization fails mid-way.
 */
 pthread_mutex_t	*rollback_forks(pthread_mutex_t *forks, int last)
@@ -31,7 +32,8 @@ pthread_mutex_t	*rollback_forks(pthread_mutex_t *forks, int last)
 }
 
 /* rollback_philos:
-*	Destroys and frees philosopher structures up to index "last - 1".
+*	Destroys and frees philosopher structures up to index "last - 1" - the last
+*	successfully initialized philo (last (i) failed: was not malloced).
 *	Used when philosopher allocation/init fails mid-way.
 */
 t_philo	**rollback_philos(t_philo **philos, int last)

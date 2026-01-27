@@ -6,7 +6,7 @@
 /*   By: vlundaev <vlundaev@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 17:14:24 by vlundaev          #+#    #+#             */
-/*   Updated: 2026/01/26 22:52:17 by vlundaev         ###   ########.fr       */
+/*   Updated: 2026/01/27 02:10:35 by vlundaev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,10 @@ t_table	*init_table(int ac, char **av)
 	init_table_args(table, ac, av);
 	init_table_defaults(table);
 	if (init_global_mutexes(table) != 0)
+	{
+		free(table);
 		return (NULL);
+	}
 	table->philos = init_philosophers(table);
 	if (!table->philos)
 		return (error_return_null(STR_ERR_MALLOC, NULL, table));
