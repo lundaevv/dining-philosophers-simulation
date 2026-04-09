@@ -1,14 +1,14 @@
-# Philosophers — Concurrency
+# Dining Philosophers Problem (Multithreaded Simulation)
 
-Dining Philosophers problem implemented in C using threads, mutexes, and synchronization.
+A multithreaded implementation of the Dining Philosophers problem in C, demonstrating synchronization using mutexes, thread coordination, and precise timing control.
 
 ## 🧠 Overview
 
-This project simulates philosophers sitting at a table, alternating between eating, sleeping, and thinking while competing for shared forks.
+The project focuses on correct concurrent behavior, avoiding race conditions, deadlocks, and starvation.
 
-The main focus is correct concurrent behavior and synchronization:
+Key aspects include:
 
-- one thread per philosopher
+- one thread per philosopher (pthread-based)
 - one mutex per fork
 - synchronized output
 - death monitoring
@@ -21,6 +21,8 @@ The main focus is correct concurrent behavior and synchronization:
 - Stops when a philosopher dies
 - Optional limit on number of meals
 - Safe initialization and cleanup (rollback on failure)
+- Deadlock-free fork acquisition strategy
+- Thread-safe state management
 
 ## 🛠 Tech Stack
 
@@ -34,8 +36,8 @@ The main focus is correct concurrent behavior and synchronization:
 
 - **Philosophers (threads)** — each philosopher runs in its own thread  
 - **Forks (mutexes)** — shared resources protected by mutexes  
-- **Monitor** — checks death conditions and stops simulation  
-- **Timing system** — controls precise action timing
+- **Monitor** — continuously checks death conditions and enforces simulation termination
+- **Timing system** — ensures accurate timing using `gettimeofday` and custom sleep logic
 
 ## 🧠 Core Concepts
 
@@ -44,13 +46,25 @@ The main focus is correct concurrent behavior and synchronization:
 - Deadlocks and starvation
 - Race conditions
 - Thread lifecycle management
+- Thread synchronization primitives
 
 ## ⚡ Challenges
 
-- Preventing deadlocks when multiple threads compete for resources  
+- Preventing deadlocks when multiple threads compete for resources
+- Ensuring consistent behavior under high concurrency (up to 200 threads)
+- Designing a deadlock-free fork acquisition strategy 
 - Avoiding starvation while maintaining performance  
 - Synchronizing output to prevent race conditions  
-- Handling precise timing in a multithreaded environment  
+- Handling precise timing in a multithreaded environment
+
+## Key Learnings
+
+- Understanding race conditions and how to prevent them
+- Designing deadlock-free synchronization strategies
+- Managing shared state across multiple threads
+- Implementing precise timing in concurrent systems
+- Building reliable and predictable multithreaded applications
+- Debugging and reasoning about non-deterministic behavior in concurrent systems
 
 ## ⚙️ Build
 
@@ -97,7 +111,7 @@ Run until each philosopher eats 3 times:
 
 ## 🖥 Output Format
 
-The program prints timestamped status messages in the standard `philo` format:
+The program prints timestamped status messages in the following format:
 
 ```text
 <timestamp_in_ms> <philosopher_id> has taken a fork
